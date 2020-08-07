@@ -10,9 +10,9 @@ from bot_service import BotService
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
+BOT_NAME = os.getenv('BOT_NAME')
 SRE_CHANNEL_NAME = 'site-reliability-stuff'
 BOT_CHANNEL_NAME = 'bot_testing'
-BOT_NAME = "heroku"
 SRE_ROLE_NAME = "Site Reliability"
 bot = commands.Bot(command_prefix='!')
 bot_service = BotService(bot, GUILD, SRE_ROLE_NAME)
@@ -57,7 +57,7 @@ async def which(ctx):
     await ctx.send(BOT_NAME)
 
 if __name__ == '__main__':
-    print("starting bot")
+    print(f"Starting bot: {BOT_NAME}")
     print(f"Entering guild: {GUILD}")
     bot.run(TOKEN)
 
