@@ -1,5 +1,13 @@
 Reminder Robin Dev Notes
+---
+Well still haven't looked into the async testing and split things up so logic can be tested outside of the async
 
+Now the problem is figure out what's going wrong when trying to run on Heroku
+I think the next step is to add basic logging as the prints I'm pretty sure aren't going anywhere.
+
+https://www.machinelearningplus.com/python/python-logging-guide/
+
+---
 Well testing async stuff is tricky...
 
 Best guess at that path would be to try...
