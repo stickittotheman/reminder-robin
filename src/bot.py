@@ -12,7 +12,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 SRE_CHANNEL_NAME = 'site-reliability-stuff'
 BOT_CHANNEL_NAME = 'bot_testing'
-BOT_NAME = "coco local"
+BOT_NAME = "heroku"
 SRE_ROLE_NAME = "Site Reliability"
 bot = commands.Bot(command_prefix='!')
 bot_service = BotService(bot, GUILD, SRE_ROLE_NAME)
