@@ -1,10 +1,10 @@
 # bot.py
 import os
 
-import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+import discord_utils
 from bot_service import BotService
 
 load_dotenv()
@@ -29,13 +29,6 @@ async def greet():
     await bot_channel.send("chirp chirp!")
 
 
-# @bot.command()
-# async def choose(ctx):
-#     member: discord.Member = bot_service.choose_member()
-#
-#     response = f'I choose you pickachu: {member.display_name}'
-#     await ctx.send(response)
-
 @bot.command()
 async def choose(ctx):
     response = bot_service.handle_choose_member_from()
@@ -56,8 +49,14 @@ async def ping(ctx):
 async def which(ctx):
     await ctx.send(BOT_NAME)
 
+
+@bot.command()
+async def env(ctx):
+    await ctx.send(discord_utils.safe_env_vars())
+
 if __name__ == '__main__':
-    print(f"Starting bot: {BOT_NAME}")
-    print(f"Entering guild: {GUILD}")
+    discord_utils.output(f"Starting bot: {BOT_NAME}")
+    discord_utils.output(f"Entering guild: {GUILD}")
+
     bot.run(TOKEN)
 

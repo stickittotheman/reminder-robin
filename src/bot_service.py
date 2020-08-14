@@ -1,8 +1,10 @@
+import os
+
 import discord
 
 import member
 from discord_utils import find_guild_in, find_channel_id_in, get_guild_members_as_string_from, choose_member_from, \
-    find_role
+    find_role, sanitize_env_vars
 
 
 class BotService:
@@ -37,4 +39,3 @@ class BotService:
         choosen_member: discord.Member = self.choose_member_from(self.sre_role_name)
 
         return f'I choose you pickachu: {choosen_member.display_name}'
-

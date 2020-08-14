@@ -1,12 +1,15 @@
+import os
 import random
+import sys
 from typing import List
 
 import discord
 from discord import Guild
 from more_itertools import first_true
 
-import role
 from member import Member
+
+SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME']
 
 
 def find_guild_in(guild_name, guilds: List[Guild]) -> Guild:
@@ -18,7 +21,6 @@ def find_channel_id_in(channel_name, guilds: List[Guild]):
         for channel in guild.channels:
             if channel.name == channel_name:
                 channel_id = channel.id
-                # print(channel.name + ' - ' + str(channel_id))
                 return channel_id
 
 
@@ -27,14 +29,14 @@ def get_guild_members_as_string_from(guild):
 
 
 def print_members(user_name, guild):
-    print(
+    output(
         f'{user_name} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})\n'
     )
 
     members = get_guild_members_as_string_from(guild)
 
-    print(f'Guild Members:\n - {members}')
+    output(f'Guild Members:\n - {members}')
 
 
 def choose_member_from(members: List[Member]):
@@ -44,3 +46,18 @@ def choose_member_from(members: List[Member]):
 def find_role(role_name, roles: List[discord.Role]) -> discord.Role:
     return first_true(roles, None, lambda a_role: a_role.name == role_name)
 
+
+def sanitize_env_vars(env_vars, safe_keys):
+    filtered_env_vars = {key: value for (key, value) in env_vars.items() if key in safe_keys}
+    return filtered_env_vars
+
+
+def safe_env_vars():
+    env_vars = sanitize_env_vars(os.environ, SAFE_KEYS)
+    output(env_vars)
+    return env_vars
+
+
+def output(msg):
+    print(msg)
+    sys.stdout.flush()
