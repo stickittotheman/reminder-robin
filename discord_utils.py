@@ -74,8 +74,7 @@ def health(bot_config: BotConfig):
     return f"{bot_name_str}\n{started_at_str}\n{env_vars}"
 
 
-
 def output(msg):
-    print(msg)
-    sys.stdout.flush()
+    # print(msg)
+    # sys.stdout.flush()
     logging.info(msg)
