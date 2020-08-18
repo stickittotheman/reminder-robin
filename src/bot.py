@@ -21,7 +21,7 @@ async def on_ready():
 async def greet():
     bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
     bot_channel = await bot.fetch_channel(bot_channel_id)
-    await bot_channel.send("chirp chirp!")
+    await bot_channel.send(f"chirp chirp! I woke up at: {bot_config.started_at}")
 
 
 @bot.command()
