@@ -13,7 +13,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME']
+SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME', 'HOSTNAME', 'DYNO']
 
 
 def find_guild_in(guild_name, guilds: List[Guild]) -> Guild:
