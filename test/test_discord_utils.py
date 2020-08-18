@@ -1,7 +1,9 @@
 import unittest
+from datetime import time
 from unittest import TestCase
 
 from assertpy import assert_that
+from timebetween import is_time_between
 
 from discord_utils import choose_member_from, find_role, sanitize_env_vars, SAFE_KEYS
 from member import Member
@@ -9,6 +11,15 @@ from role import Role
 
 
 class TestDiscordUtils(TestCase):
+    def test_time(self):
+        start = time(7, 0)
+        end = time(19, 0)
+
+        inside_of_interval = time(11, 0)
+        outside_of_interval = time(20, 0)
+        assert_that(is_time_between(inside_of_interval, start, end)).is_true()
+        assert_that(is_time_between(outside_of_interval, start, end)).is_false()
+
     def test_choose_member(self):
         m1 = Member("foo")
         m2 = Member("Bar")

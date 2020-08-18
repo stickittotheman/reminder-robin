@@ -59,5 +59,5 @@ if __name__ == '__main__':
     discord_utils.output(f"Entering guild: {bot_config.guild_name}")
     STARTED_AT = datetime.now()
 
-    bot.run(bot_config.token)
+    bot.run(bot_config.discord_token)
 
