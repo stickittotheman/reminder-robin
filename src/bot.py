@@ -24,6 +24,12 @@ async def greet():
     await bot_channel.send(f"chirp chirp! I woke up at: {bot_config.started_at}")
 
 
+async def night_night():
+    bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
+    bot_channel = await bot.fetch_channel(bot_channel_id)
+    await bot_channel.send(f"Nighty nighty!")
+
+
 @bot.command()
 async def choose(ctx):
     response = bot_service.handle_choose_member_from()
