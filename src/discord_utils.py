@@ -7,7 +7,11 @@ import discord
 from discord import Guild
 from more_itertools import first_true
 
+from bot_config import BotConfig
 from member import Member
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME']
 
@@ -58,6 +62,20 @@ def safe_env_vars():
     return env_vars
 
 
+def health(bot_config: BotConfig):
+    bot_name_str = f"Bot name: {bot_config.bot_name}"
+    started_at_str = f"Started at: {bot_config.started_at}"
+    env_vars = f"Bot Env: {sanitize_env_vars(os.environ, SAFE_KEYS)}"
+
+    output(bot_name_str)
+    output(started_at_str)
+    output(env_vars)
+
+    return f"{bot_name_str}\n{started_at_str}\n{env_vars}"
+
+
+
 def output(msg):
     print(msg)
     sys.stdout.flush()
+    logging.info(msg)

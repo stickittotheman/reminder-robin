@@ -1,21 +1,16 @@
 # bot.py
-import os
+from datetime import datetime
 
 from discord.ext import commands
-from dotenv import load_dotenv
 
 import discord_utils
+from bot_config import initialize_bot_config
 from bot_service import BotService
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
-BOT_NAME = os.getenv('BOT_NAME')
-SRE_CHANNEL_NAME = 'site-reliability-stuff'
-BOT_CHANNEL_NAME = 'bot_testing'
-SRE_ROLE_NAME = "Site Reliability"
+
 bot = commands.Bot(command_prefix='!')
-bot_service = BotService(bot, GUILD, SRE_ROLE_NAME)
+bot_config = initialize_bot_config(datetime.now())
+bot_service = BotService(bot, bot_config)
 
 
 @bot.event
@@ -24,7 +19,7 @@ async def on_ready():
 
 
 async def greet():
-    bot_channel_id = bot_service.find_channel_id(BOT_CHANNEL_NAME)
+    bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
     bot_channel = await bot.fetch_channel(bot_channel_id)
     await bot_channel.send("chirp chirp!")
 
@@ -47,16 +42,22 @@ async def ping(ctx):
 
 @bot.command()
 async def which(ctx):
-    await ctx.send(BOT_NAME)
+    await ctx.send(bot_config.bot_name)
 
 
 @bot.command()
 async def env(ctx):
     await ctx.send(discord_utils.safe_env_vars())
 
-if __name__ == '__main__':
-    discord_utils.output(f"Starting bot: {BOT_NAME}")
-    discord_utils.output(f"Entering guild: {GUILD}")
 
-    bot.run(TOKEN)
+@bot.command()
+async def health(ctx):
+    await ctx.send(discord_utils.health(bot_config))
+
+if __name__ == '__main__':
+    discord_utils.output(f"Starting bot: {bot_config.bot_name}")
+    discord_utils.output(f"Entering guild: {bot_config.guild_name}")
+    STARTED_AT = datetime.now()
+
+    bot.run(bot_config.token)
 

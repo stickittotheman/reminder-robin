@@ -8,7 +8,6 @@ from member import Member
 from role import Role
 
 
-
 class TestDiscordUtils(TestCase):
     def test_choose_member(self):
         m1 = Member("foo")
