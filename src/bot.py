@@ -24,7 +24,7 @@ async def greet():
     await bot_channel.send(f"chirp chirp! I woke up at: {bot_config.started_at}")
 
 
-@bot.command()
+@bot.command(help="Randomly chooses a person from the role set via the SRE_ROLE_NAME environment variable")
 async def choose(ctx):
     response = bot_service.handle_choose_member_from()
     await ctx.send(response)

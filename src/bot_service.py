@@ -35,4 +35,4 @@ class BotService:
     def handle_choose_member_from(self) -> str:
         choosen_member: discord.Member = self.choose_member_from(self.bot_config.sre_role_name)
 
-        return f'I choose you pickachu: {choosen_member.display_name}'
+        return f'I choose you pickachu: <@{choosen_member.id}>'
