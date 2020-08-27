@@ -51,3 +51,5 @@ if __name__ == '__main__':
     number_of_dynos = desired_heroku_scale_for(datetime.now().time(), bot_config.start_time, bot_config.end_time)
     result_msg = scale(number_of_dynos)
     output(result_msg)
+    res = requests.post("https://nosnch.in/21999e7da7", data={"m": f"Scaled to {number_of_dynos} dynos"})
+    output(res)
