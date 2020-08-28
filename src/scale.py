@@ -1,9 +1,8 @@
 import base64
 import json
-from datetime import datetime
+from datetime import datetime, time, timedelta
 
 import requests
-from timebetween import is_time_between
 
 from bot_config import initialize_bot_config, BotConfig
 from discord_utils import output
@@ -11,6 +10,7 @@ from discord_utils import output
 APP = 'salty-bastion-04148'
 PROCESS = 'worker'
 HEADERS = None
+ARBITRARY_DATE = datetime(1988, 3, 14)
 
 
 def scale(size):
@@ -33,8 +33,8 @@ def desired_heroku_scale_for(time, start, end):
     return 0
 
 
-def build_heroku_api_request_headers(bot_config: BotConfig):
-    utf_encoded_key = bot_config.heroku_api_key.encode("utf-8")
+def build_heroku_api_request_headers(the_bot_config: BotConfig):
+    utf_encoded_key = the_bot_config.heroku_api_key.encode("utf-8")
     # Generate Base64 encoded API Key
     base_key = base64.b64encode(utf_encoded_key)
     # Create headers for API call
@@ -43,6 +43,32 @@ def build_heroku_api_request_headers(bot_config: BotConfig):
         "Authorization": base_key
     }
     return built_headers
+
+
+def is_time_between(t, start, end):
+    if start == end:
+        return True
+    day_add = 1 if end < start else 0
+    end_add = 1 if day_add and end == time(0, 0, 0, 0) else 0
+    test_add = 1 if day_add and t < start else 0
+    td_time_start = timedelta(hours=start.hour,
+                              minutes=start.minute,
+                              seconds=start.second,
+                              microseconds=start.microsecond)
+    td_time_end = timedelta(days=day_add + end_add,
+                            hours=end.hour,
+                            minutes=end.minute,
+                            seconds=end.second,
+                            microseconds=end.microsecond)
+    td_testing = timedelta(days=test_add,
+                           hours=t.hour,
+                           minutes=t.minute,
+                           seconds=t.second,
+                           microseconds=t.microsecond)
+    start_date = ARBITRARY_DATE + td_time_start
+    end_date = ARBITRARY_DATE + td_time_end
+    testing_date = ARBITRARY_DATE + td_testing
+    return start_date <= testing_date <= end_date
 
 
 if __name__ == '__main__':
