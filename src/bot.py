@@ -51,6 +51,11 @@ async def env(ctx):
 
 
 @bot.command()
+async def current_config(ctx):
+    await ctx.send(discord_utils.current_configuration(bot_config))
+
+
+@bot.command()
 async def health(ctx):
     await ctx.send(discord_utils.health(bot_config))
 
