@@ -5,9 +5,13 @@ from unittest import TestCase
 from assertpy import assert_that
 from timebetween import is_time_between
 
-from discord_utils import choose_member_from, find_role, sanitize_env_vars, SAFE_KEYS
+from bot_config import BotConfig
+from discord_utils import choose_member_from, find_role, sanitize_env_vars, SAFE_KEYS, current_configuration, \
+    SAFE_CONFIG_VARS, sanitize_config
 from member import Member
 from role import Role
+
+test_config = BotConfig("discord token", "guild name", "bot name", "started at", "heroku key")
 
 
 class TestDiscordUtils(TestCase):
@@ -46,6 +50,21 @@ class TestDiscordUtils(TestCase):
         assert_that(result.keys()).contains('DISCORD_GUILD')
         assert_that(result.keys()).contains('BOT_NAME')
         assert_that(result.keys()).does_not_contain('DISCORD_TOKEN')
+
+    def test_sanitize_config(self):
+        result = sanitize_config(test_config, SAFE_CONFIG_VARS)
+
+        assert_that(result.keys()).contains('bot_name')
+        assert_that(result.keys()).does_not_contain('discord_token')
+        assert_that(result.keys()).does_not_contain('heroku_api_key')
+
+    def test_get_current_configuration(self):
+        assert_that(current_configuration(test_config)).is_equal_to("""{'bot_channel_name': 'bot_testing',
+ 'bot_name': 'bot name',
+ 'guild_name': 'guild name',
+ 'sre_channel_name': 'site-reliability-stuff',
+ 'sre_role_name': 'Site Reliability',
+ 'started_at': 'started at'}""")
 
 
 if __name__ == '__main__':

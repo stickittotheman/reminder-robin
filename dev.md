@@ -1,5 +1,9 @@
 Reminder Robin Dev Notes
 ---
+Things that might want doing...
+- Some sanity check around config vars. We were able to deploy and the prod env didn't have them all and that was a problem.
+
+---
 Well still haven't looked into the async testing and split things up so logic can be tested outside of the async
 
 Now the problem is figure out what's going wrong when trying to run on Heroku

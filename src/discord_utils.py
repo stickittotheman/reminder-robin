@@ -1,4 +1,5 @@
 import os
+import pprint
 import random
 import sys
 from typing import List
@@ -14,6 +15,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME', 'HOSTNAME', 'DYNO']
+SAFE_CONFIG_VARS = [
+"guild_name",
+"bot_name",
+"started_at",
+"sre_role_name",
+"sre_channel_name",
+"bot_channel_name",
+]
 
 
 def find_guild_in(guild_name, guilds: List[Guild]) -> Guild:
@@ -56,10 +65,20 @@ def sanitize_env_vars(env_vars, safe_keys):
     return filtered_env_vars
 
 
+def sanitize_config(bot_config, safe_config_vars):
+    filtered_env_vars = {key: bot_config.__dict__[key] for key in safe_config_vars}
+    return filtered_env_vars
+
+
 def safe_env_vars():
     env_vars = sanitize_env_vars(os.environ, SAFE_KEYS)
     output(env_vars)
     return env_vars
+
+
+def current_configuration(bot_config: BotConfig):
+    safe_config_vars = sanitize_config(bot_config, SAFE_CONFIG_VARS)
+    return pprint.pformat(safe_config_vars)
 
 
 def health(bot_config: BotConfig):
