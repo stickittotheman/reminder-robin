@@ -85,12 +85,14 @@ def health(bot_config: BotConfig):
     bot_name_str = f"Bot name: {bot_config.bot_name}"
     started_at_str = f"Started at: {bot_config.started_at}"
     env_vars = f"Bot Env: {sanitize_env_vars(os.environ, SAFE_KEYS)}"
+    current_config = f"Bot Config: {current_configuration(bot_config)}"
 
     output(bot_name_str)
     output(started_at_str)
     output(env_vars)
+    output(current_config)
 
-    return f"{bot_name_str}\n{started_at_str}\n{env_vars}"
+    return f"{bot_name_str}\n{started_at_str}\n{env_vars}\n{current_config}"
 
 
 def output(msg):
