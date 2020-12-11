@@ -7,7 +7,7 @@ from discord.ext import commands
 import discord_utils
 from bot_config import initialize_bot_config
 from bot_service import BotService
-
+from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji
 
 bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
@@ -77,9 +77,39 @@ async def add_topic(ctx, arg):
 @bot.command()
 async def list_topics(ctx):
     topics = bot_service.all_topics()
-    for t in topics:
-        msg = await ctx.send(t)
 
+    for t in topics:
+        msg = await ctx.send(t.title)
+        t.id = msg.id
+        await msg.add_reaction("🗳️")
+
+
+@bot.command()
+async def call_vote(ctx):
+    msg = await ctx.send("Continue?")
+    await msg.add_reaction(THUMBS_UP)
+    await msg.add_reaction(THUMBS_DOWN)
+    print(f"msg id: {msg.id}")
+
+
+@bot.command()
+async def process_vote(ctx, arg):
+    msg = await ctx.fetch_message(arg)
+    up_count = get_count_for_emoji(msg, THUMBS_UP)
+    down_count = get_count_for_emoji(msg, THUMBS_DOWN)
+    await ctx.send(f"👍: {up_count}")
+    await ctx.send(f"👎: {down_count}")
+    if up_count < down_count:
+        await ctx.send(f"Alright next topic!")
+    else:
+        await ctx.send(f"Continue the conversation...")
+
+
+@bot.command()
+async def msg_info(ctx, arg):
+    msg = await ctx.fetch_message(arg)
+    for x in msg.reactions:
+        await ctx.send(f"reaction: {x.emoji} count: {x.count}")
 
 
 if __name__ == '__main__':
@@ -88,4 +118,3 @@ if __name__ == '__main__':
     STARTED_AT = datetime.now()
 
     bot.run(bot_config.discord_token)
-
