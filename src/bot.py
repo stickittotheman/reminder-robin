@@ -1,6 +1,7 @@
 # bot.py
 from datetime import datetime
 
+import discord
 from discord.ext import commands
 
 import discord_utils
@@ -58,6 +59,28 @@ async def current_config(ctx):
 @bot.command()
 async def health(ctx):
     await ctx.send(discord_utils.health(bot_config))
+
+
+@bot.command()
+async def noise(ctx):
+    voicechannel = discord.utils.get(ctx.guild.channels, name='Bot Voice')
+    vc = await voicechannel.connect()
+    vc.play(discord.FFmpegPCMAudio("countdown.mp3"), after=lambda e: print('done', e))
+
+
+@bot.command()
+async def add_topic(ctx, arg):
+    bot_service.add_topic(arg)
+    await ctx.send(f"Added topic: {arg}")
+
+
+@bot.command()
+async def list_topics(ctx):
+    topics = bot_service.all_topics()
+    for t in topics:
+        msg = await ctx.send(t)
+
+
 
 if __name__ == '__main__':
     discord_utils.output(f"Starting bot: {bot_config.bot_name}")

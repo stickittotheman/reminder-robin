@@ -3,12 +3,14 @@ import discord
 import member
 from discord_utils import find_guild_in, find_channel_id_in, get_guild_members_as_string_from, choose_member_from, \
     find_role
+from model.topic import Topic
 
 
 class BotService:
     def __init__(self, bot, bot_config):
         self.bot = bot
         self.bot_config = bot_config
+        self.topics = []
 
     def find_guild(self):
         guilds = self.bot.guilds
@@ -36,3 +38,11 @@ class BotService:
         choosen_member: discord.Member = self.choose_member_from(self.bot_config.sre_role_name)
 
         return f'I choose you pickachu: <@{choosen_member.id}>'
+
+    def add_topic(self, topic):
+
+        self.topics.append(Topic("",topic))
+        return self.topics
+
+    def all_topics(self):
+        return self.topics
