@@ -1,4 +1,5 @@
 # bot.py
+import json
 from datetime import datetime
 
 import discord
@@ -8,10 +9,12 @@ import discord_utils
 from bot_config import initialize_bot_config
 from bot_service import BotService
 from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji
+from topic_service import TopicService
 
 bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
 bot_service = BotService(bot, bot_config)
+topic_service = TopicService()
 
 
 @bot.event
@@ -70,18 +73,26 @@ async def noise(ctx):
 
 @bot.command()
 async def add_topic(ctx, arg):
-    bot_service.add_topic(arg)
+    topic_service.add(arg)
     await ctx.send(f"Added topic: {arg}")
 
 
 @bot.command()
 async def list_topics(ctx):
-    topics = bot_service.all_topics()
+    topics = topic_service.all()
 
     for t in topics:
         msg = await ctx.send(t.title)
         t.id = msg.id
         await msg.add_reaction("🗳️")
+
+
+@bot.command()
+async def dump_topics(ctx):
+    topics = topic_service.all()
+
+    for t in topics:
+        msg = await ctx.send(json.dumps(t.__dict__))
 
 
 @bot.command()

@@ -14,27 +14,28 @@ from discord_utils import choose_member_from, find_role, sanitize_env_vars, SAFE
 from member import Member
 from model.topic import Topic
 from role import Role
+from topic_service import TopicService
 
 test_config = BotConfig("discord token", "guild name", "bot name", "started at", "heroku key")
 
 bot = commands.Bot(command_prefix='!')
-service = BotService(bot, test_config)
+service = TopicService()
 
 
 class TestBotService(TestCase):
     def test_add_topic(self):
-        service.add_topic("expected")
+        service.add("expected")
 
-        topics = service.all_topics()
+        topics = service.all()
 
         assert_that(topics[0].title).is_equal_to("expected")
 
     def test_build_formatted_list_of_topics(self):
         expectedTopic = Topic("", "expected")
 
-        service.add_topic(expectedTopic.title)
+        service.add(expectedTopic.title)
 
-        topics = service.all_topics()
+        topics = service.all()
 
         assert_that(topics).contains(expectedTopic)
 
