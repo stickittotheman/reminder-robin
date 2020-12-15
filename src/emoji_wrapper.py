@@ -1,5 +1,6 @@
 THUMBS_UP = "👍"
 THUMBS_DOWN = "👎"
+BALLOT_BOX = "🗳️"
 
 
 def get_count_for_emoji(msg, emoji_to_count):

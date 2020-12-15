@@ -1,7 +1,7 @@
+import logging
 import os
 import pprint
 import random
-import sys
 from typing import List
 
 import discord
@@ -10,18 +10,17 @@ from more_itertools import first_true
 
 from bot_config import BotConfig
 from member import Member
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
 SAFE_KEYS = ['DISCORD_GUILD', 'BOT_NAME', 'HOSTNAME', 'DYNO']
 SAFE_CONFIG_VARS = [
-"guild_name",
-"bot_name",
-"started_at",
-"sre_role_name",
-"sre_channel_name",
-"bot_channel_name",
+    "guild_name",
+    "bot_name",
+    "started_at",
+    "sre_role_name",
+    "sre_channel_name",
+    "bot_channel_name",
 ]
 
 

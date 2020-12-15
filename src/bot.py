@@ -8,8 +8,8 @@ from discord.ext import commands
 import discord_utils
 from bot_config import initialize_bot_config
 from bot_service import BotService
-from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji
-from topic_service import TopicService
+from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji, BALLOT_BOX
+from topic_service import TopicService, get_vote_count
 
 bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
@@ -83,8 +83,21 @@ async def list_topics(ctx):
 
     for t in topics:
         msg = await ctx.send(t.title)
-        t.id = msg.id
-        await msg.add_reaction("🗳️")
+        t.msg_id = msg.id
+        await msg.add_reaction(BALLOT_BOX)
+
+
+@bot.command()
+async def display(ctx):
+    topics = topic_service.all()
+
+    for t in topics:
+        msg = await ctx.fetch_message(t.msg_id)
+        t.vote_count = get_vote_count(msg)
+
+    topics_by_vote = sorted(topics, key=lambda the_topics: the_topics.vote_count, reverse=True)
+    for t in topics_by_vote:
+        await ctx.send(f"{t.title}: {t.vote_count}")
 
 
 @bot.command()
@@ -92,7 +105,7 @@ async def dump_topics(ctx):
     topics = topic_service.all()
 
     for t in topics:
-        msg = await ctx.send(json.dumps(t.__dict__))
+        await ctx.send(json.dumps(t.__dict__))
 
 
 @bot.command()
@@ -100,7 +113,7 @@ async def call_vote(ctx):
     msg = await ctx.send("Continue?")
     await msg.add_reaction(THUMBS_UP)
     await msg.add_reaction(THUMBS_DOWN)
-    print(f"msg id: {msg.id}")
+    print(f"msg id: {msg.msg_id}")
 
 
 @bot.command()

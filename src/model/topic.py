@@ -3,5 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Topic:
-    id: str
+    msg_id: str
     title: str
+
