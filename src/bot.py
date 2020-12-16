@@ -1,6 +1,6 @@
 # bot.py
 import json
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from time import sleep
 
 import discord
@@ -26,7 +26,7 @@ async def on_ready():
 async def greet():
     bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
     bot_channel = await bot.fetch_channel(bot_channel_id)
-    await bot_channel.send(f"chirp chirp! I woke up at: {bot_config.started_at}")
+    await bot_channel.send(f"chirp chirp! I ({bot_config.bot_name}) woke up at: {bot_config.started_at}")
 
 
 @bot.command(help="Randomly chooses a person from the role set via the SRE_ROLE_NAME environment variable")
@@ -71,22 +71,47 @@ async def noise(ctx):
     vc = await voicechannel.connect()
     vc.play(discord.FFmpegPCMAudio("countdown.mp3"), after=lambda e: print('done', e))
 
-@bot.command()
+
+@bot.command(aliases=['cd'])
 async def countdown(ctx, arg):
+    await ctx.send(f"Starting {arg} second timer")
     mins_from_now = datetime.now() + timedelta(seconds=int(arg))
     while datetime.now() < mins_from_now:
         await ctx.send(f"{mins_from_now - datetime.now()} remaining")
         sleep(10)
-    await call_vote(ctx)
+    ctx.send("Time's up!")
 
-@bot.command()
+
+@bot.command(aliases=['add'])
 async def add_topic(ctx, arg):
     topic_service.add(arg)
     await ctx.send(f"Added topic: {arg}")
 
 
 @bot.command()
+async def start_topic(ctx, display_id):
+    topic = topic_service.get_topic_by_display_id(display_id)
+    await ctx.send(f"Starting topic: {topic.title}")
+    await countdown(ctx, 90)
+
+    continue_vote_msg_id = await call_vote()
+    await countdown(ctx, 10)
+    await process_vote(ctx, continue_vote_msg_id)
+
+    next_topic = topic_service.get_next_topic(topic)
+    await ctx.send(f"Next topic by votes is : {next_topic.title}")
+    await ctx.send(f"You can start it when you are ready by using:")
+    await ctx.send(f"!start_topic {next_topic.display_id}")
+
+
+@bot.command()
 async def list_topics(ctx):
+    await ctx.send(f"Great! Now cast your votes by clicking on the emoji!")
+    await list_topics_manual(ctx)
+
+
+@bot.command(aliases=['list'])
+async def list_topics_manual(ctx):
     topics = topic_service.all()
 
     for t in topics:
@@ -95,8 +120,16 @@ async def list_topics(ctx):
         await msg.add_reaction(BALLOT_BOX)
 
 
+@bot.command(aliases=['d', 'display'])
+async def display_results(ctx):
+    await ctx.send(f"Alright, here's the topics ordered by number of votes")
+    await display_results_manual(ctx)
+    await ctx.send(f"Please choose a topic and start it with:")
+    await ctx.send(f"!start_topic <topic_number>")
+
+
 @bot.command()
-async def display(ctx):
+async def display_results_manual(ctx):
     topics = topic_service.all()
 
     for t in topics:
@@ -104,8 +137,69 @@ async def display(ctx):
         t.vote_count = get_vote_count(msg)
 
     topics_by_vote = sorted(topics, key=lambda the_topics: the_topics.vote_count, reverse=True)
+    count = 1
+    await ctx.send(f"Topic #, Title,  # of votes")
     for t in topics_by_vote:
-        await ctx.send(f"{t.title}: {t.vote_count}")
+        t.display_id = count
+        await ctx.send(f"{t.display_id}) {t.title}: {t.vote_count}")
+        count = count + 1
+
+
+@bot.command()
+async def start_session_on_rails(ctx):
+    await ctx.send(f"Welcome to Lean Robin's Lean Coffee session!")
+    topic_service.all().clear()
+    sleep(1)
+    await ctx.send(f"Let's start by adding some topics for our conversation!")
+    sleep(1)
+    await ctx.send(f"I'll give you some time to think and add")
+    sleep(1)
+    await ctx.send(f"You can add topics using:")
+    await ctx.send(f"!add_topic <some_topic_name>")
+    await countdown(ctx, 300)
+    await ctx.send(f"When the timer is done I'll list the topics for voting!")
+    await list_topics_manual(ctx)
+    await ctx.send(f"Great! Now cast your votes by clicking on the emoji!")
+    sleep(1)
+    await ctx.send(f"I'll give you a min")
+    await countdown(ctx, 60)
+    await ctx.send(f"Alright, here's the topics ordered by number of votes")
+    sleep(1)
+    await display_results_manual(ctx)
+    await ctx.send(f"Please choose a topic and start it with:")
+    await ctx.send(f"!start_topic <topic_number>")
+
+
+@bot.command(aliases=['start'])
+async def start_a_lean_coffee_session(ctx):
+    await ctx.send(f"Welcome to Lean Robin's Lean Coffee session!")
+    topic_service.all().clear()
+    sleep(1)
+    await ctx.send(f"Let's start by adding some topics for our conversation!")
+    sleep(1)
+    await ctx.send(f"You can add topics using:")
+    await ctx.send(f"!add_topic <some_topic_name>")
+    sleep(1)
+    await ctx.send(f"Now let's start a timer using:")
+    await ctx.send(f"!countdown <number of seconds>")
+    topic_service.state = "adding_topics"
+    await ctx.send(f"When the timer is finished and you are ready continue by using:")
+    await ctx.send(f"!vote")
+
+
+@bot.command(alias=['vote'])
+async def vote(ctx):
+    await ctx.send(f"Now that everyone has had time to enter topics it's time to vote!:")
+    await list_topics_manual(ctx)
+    await ctx.send(f"Now you'll probably want to start another timer!")
+    await ctx.send(f"!countdown <number of seconds>")
+    await ctx.send(f"After the timer. When you are ready to move onto the discussion you can use:")
+    await ctx.send(f"!display")
+
+
+@bot.command()
+async def intro(ctx):
+    await ctx.send(f"Some Intro")
 
 
 @bot.command()
@@ -122,6 +216,7 @@ async def call_vote(ctx):
     await msg.add_reaction(THUMBS_UP)
     await msg.add_reaction(THUMBS_DOWN)
     print(f"msg id: {msg.id}")
+    return msg.id
 
 
 @bot.command()

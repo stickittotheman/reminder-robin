@@ -23,7 +23,7 @@ class TestBotService(TestCase):
         assert_that(topics[0].title).is_equal_to("expected")
 
     def test_build_formatted_list_of_topics(self):
-        expectedTopic = Topic("", "expected")
+        expectedTopic = Topic("expected", "", "", "")
 
         service.add(expectedTopic.title)
 
