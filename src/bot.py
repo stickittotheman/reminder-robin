@@ -1,6 +1,7 @@
 # bot.py
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, time
+from time import sleep
 
 import discord
 from discord.ext import commands
@@ -70,6 +71,13 @@ async def noise(ctx):
     vc = await voicechannel.connect()
     vc.play(discord.FFmpegPCMAudio("countdown.mp3"), after=lambda e: print('done', e))
 
+@bot.command()
+async def countdown(ctx, arg):
+    mins_from_now = datetime.now() + timedelta(seconds=int(arg))
+    while datetime.now() < mins_from_now:
+        await ctx.send(f"{mins_from_now - datetime.now()} remaining")
+        sleep(10)
+    await call_vote(ctx)
 
 @bot.command()
 async def add_topic(ctx, arg):
@@ -113,7 +121,7 @@ async def call_vote(ctx):
     msg = await ctx.send("Continue?")
     await msg.add_reaction(THUMBS_UP)
     await msg.add_reaction(THUMBS_DOWN)
-    print(f"msg id: {msg.msg_id}")
+    print(f"msg id: {msg.id}")
 
 
 @bot.command()
