@@ -72,12 +72,24 @@ async def noise(ctx):
     vc.play(discord.FFmpegPCMAudio("countdown.mp3"), after=lambda e: print('done', e))
 
 
+def format_timedelta(time_remaining_as_delta):
+    pass
+
+def strfdelta(tdelta, fmt):
+    d = {"D": tdelta.days}
+    d["H"], rem = divmod(tdelta.seconds, 3600)
+    d["M"], d["S"] = divmod(rem, 60)
+    t = DeltaTemplate(fmt)
+    return t.substitute(**d)
+
 @bot.command(aliases=['cd'])
 async def countdown(ctx, arg):
     await ctx.send(f"Starting {arg} second timer")
     mins_from_now = datetime.now() + timedelta(seconds=int(arg))
     while datetime.now() < mins_from_now:
-        await ctx.send(f"{mins_from_now - datetime.now()} remaining")
+        time_remaining_as_delta = mins_from_now - datetime.now()
+        time_remaining = format_timedelta(time_remaining_as_delta)
+        await ctx.send(f"{time_remaining} remaining")
         sleep(10)
     ctx.send("Time's up!")
 
