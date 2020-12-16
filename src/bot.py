@@ -91,12 +91,14 @@ async def add_topic(ctx, arg):
 @bot.command()
 async def start_topic(ctx, display_id):
     topic = topic_service.get_topic_by_display_id(display_id)
-    await ctx.send(f"Starting topic: {topic.title}")
-    await countdown(ctx, 90)
+    await ctx.send(f"Let's chat about!: {topic.title}")
+    should_continue = True
+    while should_continue:
+        await countdown(ctx, 90)
 
-    continue_vote_msg_id = await call_vote()
-    await countdown(ctx, 10)
-    await process_vote(ctx, continue_vote_msg_id)
+        continue_vote_msg_id = await call_vote()
+        await countdown(ctx, 10)
+        should_continue = await process_vote(ctx, continue_vote_msg_id)
 
     next_topic = topic_service.get_next_topic(topic)
     await ctx.send(f"Next topic by votes is : {next_topic.title}")
@@ -228,8 +230,10 @@ async def process_vote(ctx, arg):
     await ctx.send(f"👎: {down_count}")
     if up_count < down_count:
         await ctx.send(f"Alright next topic!")
+        return False
     else:
         await ctx.send(f"Continue the conversation...")
+        return True
 
 
 @bot.command()
