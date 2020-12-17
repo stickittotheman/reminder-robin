@@ -12,6 +12,7 @@ from bot_service import BotService
 from datetime_wrapper import format_timedelta
 from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji, BALLOT_BOX
 from topic_service import TopicService, get_vote_count
+from yt import YTDLSource
 
 bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
@@ -70,11 +71,8 @@ async def health(ctx):
 async def noise(ctx):
     voicechannel = discord.utils.get(ctx.guild.channels, name='Bot Voice')
     vc = await voicechannel.connect()
-    vc.play(discord.FFmpegPCMAudio("countdown.mp3"), after=lambda e: print('done', e))
-
-
-
-
+    vc.play(discord.FFmpegPCMAudio("youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.webm"), after=lambda e: print('done', e))
+    await ctx.send("playing noise")
 
 @bot.command(aliases=['cd'])
 async def countdown(ctx, arg):
@@ -82,10 +80,12 @@ async def countdown(ctx, arg):
     mins_from_now = datetime.now() + timedelta(seconds=int(arg))
     while datetime.now() < mins_from_now:
         time_remaining_as_delta = mins_from_now - datetime.now()
+        if time_remaining_as_delta.seconds < 5:
+            await noise(ctx)
         time_remaining = format_timedelta(time_remaining_as_delta)
         await ctx.send(f"{time_remaining} remaining")
         sleep(10)
-    ctx.send("Time's up!")
+    await ctx.send("Time's up!")
 
 
 @bot.command(aliases=['add'])
@@ -247,6 +247,15 @@ async def msg_info(ctx, arg):
     msg = await ctx.fetch_message(arg)
     for x in msg.reactions:
         await ctx.send(f"reaction: {x.emoji} count: {x.count}")
+
+
+@bot.command()
+async def yt(ctx, url):
+    """Plays from a url (almost anything youtube_dl supports)"""
+
+    async with ctx.typing():
+        player = await YTDLSource.from_url(url, loop=bot.loop)
+        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
 
 if __name__ == '__main__':
