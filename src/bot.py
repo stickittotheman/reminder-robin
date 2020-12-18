@@ -102,8 +102,8 @@ async def start_topic(ctx, display_id):
     while should_continue:
         await countdown(ctx, 90)
 
-        continue_vote_msg_id = await call_vote()
-        await countdown(ctx, 10)
+        continue_vote_msg_id = await call_vote(ctx)
+        await countdown(ctx, 18)
         should_continue = await process_vote(ctx, continue_vote_msg_id)
 
     next_topic = topic_service.get_next_topic(topic)
@@ -190,8 +190,7 @@ async def start_a_lean_coffee_session(ctx):
     sleep(1)
     await ctx.send(f"Now let's start a timer using:")
     await ctx.send(f"!countdown <number of seconds>")
-    topic_service.state = "adding_topics"
-    await ctx.send(f"When the timer is finished and you are ready continue by using:")
+    await ctx.send(f"When the timer is finished, and you are ready, continue by using:")
     await ctx.send(f"!vote")
 
 
@@ -203,11 +202,6 @@ async def vote(ctx):
     await ctx.send(f"!countdown <number of seconds>")
     await ctx.send(f"After the timer. When you are ready to move onto the discussion you can use:")
     await ctx.send(f"!display")
-
-
-@bot.command()
-async def intro(ctx):
-    await ctx.send(f"Some Intro")
 
 
 @bot.command()
