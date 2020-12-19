@@ -89,9 +89,10 @@ async def countdown(ctx, arg):
 
 
 @bot.command(aliases=['add'])
-async def add_topic(ctx, arg):
-    topic_service.add(arg)
-    await ctx.send(f"Added topic: {arg}")
+async def add_topic(ctx, *args):
+    topic = ' '.join(map(str, args))
+    topic_service.add(topic)
+    await ctx.send(f"Added topic: {topic}")
 
 
 @bot.command()
@@ -151,31 +152,6 @@ async def display_results_manual(ctx):
         t.display_id = count
         await ctx.send(f"{t.display_id}) {t.title}: {t.vote_count}")
         count = count + 1
-
-
-@bot.command()
-async def start_session_on_rails(ctx):
-    await ctx.send(f"Welcome to Lean Robin's Lean Coffee session!")
-    topic_service.all().clear()
-    sleep(1)
-    await ctx.send(f"Let's start by adding some topics for our conversation!")
-    sleep(1)
-    await ctx.send(f"I'll give you some time to think and add")
-    sleep(1)
-    await ctx.send(f"You can add topics using:")
-    await ctx.send(f"!add_topic <some_topic_name>")
-    await countdown(ctx, 300)
-    await ctx.send(f"When the timer is done I'll list the topics for voting!")
-    await list_topics_manual(ctx)
-    await ctx.send(f"Great! Now cast your votes by clicking on the emoji!")
-    sleep(1)
-    await ctx.send(f"I'll give you a min")
-    await countdown(ctx, 60)
-    await ctx.send(f"Alright, here's the topics ordered by number of votes")
-    sleep(1)
-    await display_results_manual(ctx)
-    await ctx.send(f"Please choose a topic and start it with:")
-    await ctx.send(f"!start_topic <topic_number>")
 
 
 @bot.command(aliases=['start'])
