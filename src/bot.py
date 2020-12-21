@@ -1,4 +1,4 @@
-# bot.py
+ddddd# bot.py
 import asyncio
 import json
 from datetime import datetime, timedelta
@@ -25,55 +25,13 @@ async def on_ready():
     await greet()
 
 
-async def greet():
-    bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
-    bot_channel = await bot.fetch_channel(bot_channel_id)
-    await bot_channel.send(f"chirp chirp! I ({bot_config.bot_name}) woke up at: {bot_config.started_at}")
-
-
-@bot.command(help="Randomly chooses a person from the role set via the SRE_ROLE_NAME environment variable")
-async def choose(ctx):
-    response = bot_service.handle_choose_member_from()
-    await ctx.send(response)
-
-
-@bot.command()
-async def robin_says(ctx, arg):
-    await ctx.send(arg)
-
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send("pong")
-
-
-@bot.command()
-async def which(ctx):
-    await ctx.send(bot_config.bot_name)
-
-
-@bot.command()
-async def env(ctx):
-    await ctx.send(discord_utils.safe_env_vars())
-
-
-@bot.command()
-async def current_config(ctx):
-    await ctx.send(discord_utils.current_configuration(bot_config))
-
-
-@bot.command()
-async def health(ctx):
-    await ctx.send(discord_utils.health(bot_config))
-
-
 @bot.command()
 async def noise(ctx):
     voicechannel = discord.utils.get(ctx.guild.channels, name='Bot Voice')
     vc = await voicechannel.connect()
     vc.play(discord.FFmpegPCMAudio("youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.webm"),
             after=lambda e: print('done', e))
-    await ctx.send("playing noise")
+    await ctx.send("Your attention please!")
 
 
 @bot.command(aliases=['cd'])
@@ -232,14 +190,6 @@ async def vote(ctx):
 
 
 @bot.command()
-async def dump_topics(ctx):
-    topics = topic_service.all()
-
-    for t in topics:
-        await ctx.send(json.dumps(t.__dict__))
-
-
-@bot.command()
 async def call_vote(ctx):
     msg = await ctx.send("Continue talking about the current topic?")
     await msg.add_reaction(THUMBS_UP)
@@ -263,11 +213,61 @@ async def process_vote(ctx, arg):
         return True
 
 
+async def greet():
+    bot_channel_id = bot_service.find_channel_id(bot_config.bot_channel_name)
+    bot_channel = await bot.fetch_channel(bot_channel_id)
+    await bot_channel.send(f"chirp chirp! I ({bot_config.bot_name}) woke up at: {bot_config.started_at}")
+
+
+@bot.command(help="Randomly chooses a person from the role set via the SRE_ROLE_NAME environment variable")
+async def choose(ctx):
+    response = bot_service.handle_choose_member_from()
+    await ctx.send(response)
+
+
+@bot.command()
+async def robin_says(ctx, arg):
+    await ctx.send(arg)
+
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send("pong")
+
+
+@bot.command()
+async def which(ctx):
+    await ctx.send(bot_config.bot_name)
+
+
+@bot.command()
+async def env(ctx):
+    await ctx.send(discord_utils.safe_env_vars())
+
+
+@bot.command()
+async def current_config(ctx):
+    await ctx.send(discord_utils.current_configuration(bot_config))
+
+
+@bot.command()
+async def health(ctx):
+    await ctx.send(discord_utils.health(bot_config))
+
+
 @bot.command()
 async def msg_info(ctx, arg):
     msg = await ctx.fetch_message(arg)
     for x in msg.reactions:
         await ctx.send(f"reaction: {x.emoji} count: {x.count}")
+
+
+@bot.command()
+async def dump_topics(ctx):
+    topics = topic_service.all()
+
+    for t in topics:
+        await ctx.send(json.dumps(t.__dict__))
 
 
 if __name__ == '__main__':
