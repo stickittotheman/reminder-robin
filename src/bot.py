@@ -201,6 +201,8 @@ async def on_message(message):
     if message.content.startswith('Yes'):
         await start_topic(ctx, 1)
 
+    await bot.process_commands(message)
+
 
 @bot.command(aliases=['start'])
 async def start_a_lean_coffee_session(ctx):
