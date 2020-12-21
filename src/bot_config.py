@@ -4,7 +4,7 @@ from datetime import time
 from dotenv import load_dotenv
 
 SRE_CHANNEL_NAME = 'site-reliability-stuff'
-BOT_CHANNEL_NAME = 'bot_testing'
+BOT_CHANNEL_NAME = 'bot_cave'
 SRE_ROLE_NAME = 'Site Reliability'
 START_TIME = time(7,0)
 END_TIME = time(19,0)

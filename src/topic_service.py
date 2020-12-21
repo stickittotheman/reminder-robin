@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import discord
 
@@ -19,7 +19,7 @@ class TopicService:
         self.topics: List[Topic] = []
 
     def add(self, topic_title):
-        self.topics.append(Topic(topic_title, "", "", ""))
+        self.topics.append(Topic(topic_title, "", "", "", ""))
         return self.topics
 
     def all(self):
@@ -36,5 +36,8 @@ class TopicService:
         found_topics = [t for t in self.topics if t.display_id == int(display_id)]
         return found_topics[0]
 
-    def get_next_topic(self, topic):
-        return self.get_topic_by_display_id(int(topic.display_id) + 1)
+    def get_next_topic(self, topic) -> Optional[Topic]:
+        next_topic_id = int(topic.display_id) + 1
+        if len(self.topics) <= next_topic_id:
+            return self.get_topic_by_display_id()
+        return None

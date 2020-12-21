@@ -6,14 +6,14 @@ chardet==4.0.0
 discord==1.0.1
 discord.py==1.5.1
 idna==2.10
-more-itertools==8.4.0
-multidict==4.7.6
-python-dotenv==0.14.0
-typing-extensions==3.7.4.2
+more-itertools==8.6.0
+multidict==5.1.0
+python-dotenv==0.15.0
+typing-extensions==3.7.4.3
 websockets==8.1
-yarl==1.5.0
+yarl==1.6.3
 
 
-requests~=2.24.0
+requests~=2.25.1
 py-time-between
 PyNaCl

@@ -1,7 +1,7 @@
 # bot.py
 import asyncio
 import json
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from time import sleep
 
 import discord
@@ -13,7 +13,6 @@ from bot_service import BotService
 from datetime_wrapper import format_timedelta
 from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji, BALLOT_BOX
 from topic_service import TopicService, get_vote_count
-from yt import YTDLSource
 
 bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
@@ -101,6 +100,7 @@ async def add_topic(ctx, *args):
 @bot.command()
 async def start_topic(ctx, display_id):
     topic = topic_service.get_topic_by_display_id(display_id)
+    topic.started = True
     await ctx.send(f"Let's chat about!: {topic.title}")
     should_continue = True
     while should_continue:
@@ -221,15 +221,14 @@ async def start_a_lean_coffee_session(ctx):
         await ctx.send(f"When you are all done adding topics just say \"Ready to vote\"")
 
 
-
 @bot.command(alias=['vote'])
 async def vote(ctx):
-    await ctx.send(f"Now that everyone has had time to enter topics it's time to vote!:")
+    await ctx.send(f"Now that everyone has had time to enter topics it's time to vote!")
+    await ctx.send(f"Here are the entered topics:")
     await list_topics_manual(ctx)
-    await ctx.send(f"Now you'll probably want to start another timer!")
+    await ctx.send(f"If you'd like I can start a timer for you using:")
     await ctx.send(f"!countdown <number of seconds>")
-    await ctx.send(f"After the timer. When you are ready to move onto the discussion you can use:")
-    await ctx.send(f"!display")
+    await ctx.send(f"When you are done voting just let me know by saying \"All done voting\"")
 
 
 @bot.command()
@@ -242,10 +241,10 @@ async def dump_topics(ctx):
 
 @bot.command()
 async def call_vote(ctx):
-    msg = await ctx.send("Continue?")
+    msg = await ctx.send("Continue talking about the current topic?")
     await msg.add_reaction(THUMBS_UP)
     await msg.add_reaction(THUMBS_DOWN)
-    print(f"msg id: {msg.id}")
+#    print(f"msg id: {msg.id}")
     return msg.id
 
 
@@ -269,15 +268,6 @@ async def msg_info(ctx, arg):
     msg = await ctx.fetch_message(arg)
     for x in msg.reactions:
         await ctx.send(f"reaction: {x.emoji} count: {x.count}")
-
-
-@bot.command()
-async def yt(ctx, url):
-    """Plays from a url (almost anything youtube_dl supports)"""
-
-    async with ctx.typing():
-        player = await YTDLSource.from_url(url, loop=bot.loop)
-        ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
 
 if __name__ == '__main__':

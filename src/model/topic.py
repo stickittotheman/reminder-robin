@@ -7,4 +7,5 @@ class Topic:
     display_id: int
     msg_id: str
     vote_count: str
+    started: bool
 
