@@ -1,4 +1,5 @@
 # bot.py
+import asyncio
 import json
 from datetime import datetime, timedelta, time
 from time import sleep
@@ -71,8 +72,10 @@ async def health(ctx):
 async def noise(ctx):
     voicechannel = discord.utils.get(ctx.guild.channels, name='Bot Voice')
     vc = await voicechannel.connect()
-    vc.play(discord.FFmpegPCMAudio("youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.webm"), after=lambda e: print('done', e))
+    vc.play(discord.FFmpegPCMAudio("youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.webm"),
+            after=lambda e: print('done', e))
     await ctx.send("playing noise")
+
 
 @bot.command(aliases=['cd'])
 async def countdown(ctx, arg):
@@ -129,7 +132,7 @@ async def list_topics_manual(ctx):
         await msg.add_reaction(BALLOT_BOX)
 
 
-@bot.command(aliases=['d', 'display'])
+@bot.command(aliases=['d', 'display', 'results'])
 async def display_results(ctx):
     await ctx.send(f"Alright, here's the topics ordered by number of votes")
     await display_results_manual(ctx)
@@ -154,20 +157,67 @@ async def display_results_manual(ctx):
         count = count + 1
 
 
+@bot.command(aliases=['what'])
+async def what_is_lean_coffee(ctx):
+    async with ctx.channel.typing():
+        await ctx.send(
+            f"TL/DR Lean Coffee is a structured yet agendaless meeting where topics are driven by it's participants.")
+        await ctx.send(f"For more info and history check out http://leancoffee.org/")
+
+
+@bot.command(aliases=['how'])
+async def how_does_it_work(ctx):
+    async with ctx.channel.typing():
+        await ctx.send(f"Relax Lean Robin will guide you through a session!")
+        await asyncio.sleep(1)
+        await ctx.send(f"First you will add topics you wish to talk about")
+        await asyncio.sleep(1)
+        await ctx.send(f"Next you will vote on which topics interest you most!")
+        await asyncio.sleep(1)
+        await ctx.send(
+            f"Finally you'll start discussing a topic for usually about 3 mins. After which you will all vote "
+            f"on whether to continue for another 1-3 mins or move onto the next topic")
+
+
+@bot.event
+async def on_message(message):
+    if message.author.id == bot.user.id:
+        return
+
+    ctx = await bot.get_context(message)
+
+    if message.content.startswith('Ready to vote'):
+        async with ctx.channel.typing():
+            await ctx.send('Great! Here are all the topics:')
+            await ctx.send('You can vote by clicking on the emoji')
+            await ctx.send('When finished you can say "All done voting" or !results')
+            await vote(ctx)
+    if message.content.startswith('All done voting'):
+        async with ctx.channel.typing():
+            await ctx.send('Great! Here are the results...')
+            await display_results_manual(ctx)
+            await ctx.send("I'll start the highest voted topic")
+            await start_topic(ctx, 1)
+    if message.content.startswith('Yes'):
+        await start_topic(ctx, 1)
+
+
 @bot.command(aliases=['start'])
 async def start_a_lean_coffee_session(ctx):
-    await ctx.send(f"Welcome to Lean Robin's Lean Coffee session!")
-    topic_service.all().clear()
-    sleep(1)
-    await ctx.send(f"Let's start by adding some topics for our conversation!")
-    sleep(1)
-    await ctx.send(f"You can add topics using:")
-    await ctx.send(f"!add_topic <some_topic_name>")
-    sleep(1)
-    await ctx.send(f"Now let's start a timer using:")
-    await ctx.send(f"!countdown <number of seconds>")
-    await ctx.send(f"When the timer is finished, and you are ready, continue by using:")
-    await ctx.send(f"!vote")
+    topic_service.clear()
+    async with ctx.channel.typing():
+        await ctx.send(f"Welcome to Lean Robin's Lean Coffee session!")
+        await asyncio.sleep(1)
+
+    async with ctx.channel.typing():
+        await ctx.send(f"Let's start by adding some topics for our conversation!")
+        await asyncio.sleep(1)
+        await ctx.send(f"You can add topics using:")
+        await asyncio.sleep(1)
+        await ctx.send(f"!add_topic <some_topic_name>")
+        await asyncio.sleep(1)
+        await ctx.send(f"When you are all done adding topics just say \"Ready to vote\"")
+
 
 
 @bot.command(alias=['vote'])
