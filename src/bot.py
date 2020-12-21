@@ -1,4 +1,4 @@
-ddddd# bot.py
+# bot.py
 import asyncio
 import json
 from datetime import datetime, timedelta
