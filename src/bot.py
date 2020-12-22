@@ -69,9 +69,10 @@ async def start_topic(ctx, display_id):
         should_continue = await process_vote(ctx, continue_vote_msg_id)
 
     next_topic = topic_service.get_next_topic(topic)
-    await ctx.send(f"Next topic by votes is : {next_topic.title}")
-    await ctx.send(f"You can start it when you are ready by using:")
-    await ctx.send(f"!start_topic {next_topic.display_id}")
+    if next_topic is not None:
+        await ctx.send(f"Next topic by votes is : {next_topic.title}")
+        await ctx.send(f"You can start it when you are ready by using:")
+        await ctx.send(f"!start_topic {next_topic.display_id}")
 
 
 @bot.command()
