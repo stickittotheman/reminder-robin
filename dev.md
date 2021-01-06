@@ -1,5 +1,11 @@
 Reminder Robin Dev Notes
 ---
+- idea: use a bot to test the bot
+- add some more aliases
+    - add-topic
+    - case insensitive
+- The attn please should go into L.C. text channel
+---
 Things that might want doing...
 - Some sanity check around config vars. We were able to deploy and the prod env didn't have them all and that was a problem.
 
