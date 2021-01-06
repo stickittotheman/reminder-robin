@@ -12,6 +12,7 @@ from bot_config import initialize_bot_config
 from bot_service import BotService
 from datetime_wrapper import format_timedelta
 from emoji_wrapper import THUMBS_UP, THUMBS_DOWN, get_count_for_emoji, BALLOT_BOX
+from model.topic import Topic
 from topic_service import TopicService, get_vote_count
 
 bot = commands.Bot(command_prefix='!')
@@ -87,7 +88,7 @@ async def add_topic(ctx, *args):
 
 @bot.command()
 async def start_topic(ctx, display_id):
-    topic = topic_service.get_topic_by_display_id(display_id)
+    topic: Topic = topic_service.get_topic_by_display_id(display_id)
     topic.started = True
     await ctx.send(f"Let's chat about!: {topic.title}")
     should_continue = True
@@ -98,6 +99,7 @@ async def start_topic(ctx, display_id):
         await countdown(ctx, bot_config.lean_coffee_continue_vote_time)
         should_continue = await process_vote(ctx, continue_vote_msg_id)
 
+    topic.finished = True
     next_topic = topic_service.get_next_topic(topic)
     if next_topic is not None:
         await ctx.send(f"Next topic by votes is : {next_topic.title}")

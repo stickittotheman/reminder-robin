@@ -8,4 +8,5 @@ class Topic:
     msg_id: str
     vote_count: str
     started: bool
+    finished: bool
 
