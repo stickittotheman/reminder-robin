@@ -18,6 +18,7 @@ bot = commands.Bot(command_prefix='!')
 bot_config = initialize_bot_config(datetime.now())
 bot_service = BotService(bot, bot_config)
 topic_service = TopicService()
+timer_cancelled = False
 
 
 @bot.event
@@ -26,26 +27,55 @@ async def on_ready():
 
 
 @bot.command()
+async def join(ctx, channel: discord.VoiceChannel):
+    """Joins a voice channel"""
+
+    if ctx.voice_client is not None and channel is not None:
+        return await ctx.voice_client.move_to(channel)
+
+    if channel is not None:
+        await channel.connect()
+    else:
+        print('Failed to join channel')
+
+
+@bot.command()
 async def noise(ctx):
-    voicechannel = discord.utils.get(ctx.guild.channels, name='Bot Voice')
-    vc = await voicechannel.connect()
-    vc.play(discord.FFmpegPCMAudio("youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.webm"),
-            after=lambda e: print('done', e))
+    voice_channel: discord.VoiceChannel = discord.utils.get(ctx.guild.channels, name=bot_config.lean_coffee_voice)
+    await join(ctx, voice_channel)
+    ctx.voice_client.play(discord.FFmpegPCMAudio("..//assets//2s-youtube-VCLHsusZNQw-Bird_Chirping_Sound_Effect.mp4"),
+                          after=lambda e: print('done', e))
     await ctx.send("Your attention please!")
+
+
+def timer_should_continue(stop_at):
+    if timer_cancelled:
+        return False
+
+    if datetime.now() < stop_at:
+        return True
+    return False
+
+@bot.command(aliases=['ct'])
+async def cancel_timer(ctx):
+    global timer_cancelled
+    timer_cancelled = True
+    await ctx.send("Timer cancelled")
 
 
 @bot.command(aliases=['cd'])
 async def countdown(ctx, arg):
     await ctx.send(f"Starting {arg} second timer")
     mins_from_now = datetime.now() + timedelta(seconds=int(arg))
-    while datetime.now() < mins_from_now:
+    while timer_should_continue(mins_from_now):
         time_remaining_as_delta = mins_from_now - datetime.now()
         if time_remaining_as_delta.seconds < 5:
             await noise(ctx)
         time_remaining = format_timedelta(time_remaining_as_delta)
         await ctx.send(f"{time_remaining} remaining")
         sleep(10)
-    await ctx.send("Time's up!")
+    if not timer_cancelled:
+        await ctx.send("Time's up!")
 
 
 @bot.command(aliases=['add'])
@@ -65,7 +95,7 @@ async def start_topic(ctx, display_id):
         await countdown(ctx, 90)
 
         continue_vote_msg_id = await call_vote(ctx)
-        await countdown(ctx, 18)
+        await countdown(ctx, bot_config.lean_coffee_continue_vote_time)
         should_continue = await process_vote(ctx, continue_vote_msg_id)
 
     next_topic = topic_service.get_next_topic(topic)
@@ -195,7 +225,7 @@ async def call_vote(ctx):
     msg = await ctx.send("Continue talking about the current topic?")
     await msg.add_reaction(THUMBS_UP)
     await msg.add_reaction(THUMBS_DOWN)
-#    print(f"msg id: {msg.id}")
+    #    print(f"msg id: {msg.id}")
     return msg.id
 
 
