@@ -74,7 +74,7 @@ async def countdown(ctx, arg):
             await noise(ctx)
         time_remaining = format_timedelta(time_remaining_as_delta)
         await ctx.send(f"{time_remaining} remaining")
-        sleep(10)
+        await asyncio.sleep(10)
     if not timer_cancelled:
         await ctx.send("Time's up!")
 
